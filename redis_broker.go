@@ -63,18 +63,14 @@ func (cb *RedisCeleryBroker) SendCeleryMessage(message *CeleryMessage) error {
 func (cb *RedisCeleryBroker) GetCeleryMessage() (*CeleryMessage, error) {
 	conn := cb.Get()
 	defer conn.Close()
-	messageJSON, err := conn.Do("BLPOP", cb.queueName, "1")
+	messageJSON, err := conn.Do("BRPOP", cb.queueName, "1")
 	if err != nil {
 		return nil, err
 	}
 	if messageJSON == nil {
 		return nil, fmt.Errorf("null message received from redis")
 	}
-	messageList := messageJSON.([]interface{})
-	// check for celery message
-	if string(messageList[0].([]byte)) != "celery" {
-		return nil, fmt.Errorf("not a celery message: %v", messageList[0])
-	}
+	messageList := messageJSON.([]interface{})	
 	// parse
 	var message CeleryMessage
 	json.Unmarshal(messageList[1].([]byte), &message)
