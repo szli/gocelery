@@ -45,8 +45,7 @@ func (w *CeleryWorker) StartWorker() {
 
 					// process messages
 					taskMessage, err := w.broker.GetTaskMessage()
-					if err != nil || taskMessage == nil {						
-						log.Println("fail to get task message", err)						
+					if err != nil || taskMessage == nil {											
 						continue
 					}
 
